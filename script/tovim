@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+# tovim
+#
+# Maintainer:   Beomjoon Goh
+# Last Change:  14 Jul 2020 19:52:34 +0900
+
+set -o nounset -o pipefail -o errexit
+
+script="$(basename "$0")"
+
+function usage() {
+  cat <<-HELP
+${script} - send JSON to parent process vim.
+
+Usage: ${script} <command> [arguments]
+
+Commands:
+  cd [path]   Change current working directory of vim and terminal to [path].
+  help        Print this help message
+  make        Invoke make and open QuickFix window.  Note that it's
+              synchronous process.
+  set         Set 'g:term_bufnr' to the current terminal buffer number.
+              'g:term_bufnr' is used for terminal-to-job api (term_sendkeys()).
+  sp [file]
+  vs [file]   Open [file] with horizontal/vertical split.  If no [file] is
+              given, opens an empty buffer.
+
+See 'vimrc' for specific implementations and key mappings.  For general
+information, see ':help terminal' in vim.
+HELP
+}
+
+function change_directory() {
+  path="$(realpath "${1:-$PWD}")"
+  do_cd=1
+  [ "${path}" = "$PWD" ] && do_cd=0
+  echo "Set pwd of vim to: ${path}"
+  send call "${FUNCNAME[0]}" "${path}" ${do_cd}
+}
+
+function split() {
+  if [ $# -eq 1 ]; then
+    send call "${FUNCNAME[0]}" "$1" new
+  else
+    send call "${FUNCNAME[0]}" "$1" "$(realpath "$2")"
+  fi
+}
+
+function make() {
+  makefile=( ./{M,m}akefile )
+  makeable=0
+  for f in "${makefile[@]}"; do
+    if [ -f "${f}" ]; then
+      makeable=1
+      break
+    fi
+  done
+  if [ ${makeable} -eq 0 ]; then
+    >&2 echo "no makefile found."
+    return
+
+  fi
+  change_directory
+  echo "make" "$@"
+  send call "${FUNCNAME[0]}" "$@"
+}
+
+function set_terminal_bufnr() {
+  send call "${FUNCNAME[0]}"
+}
+
+function send() {
+  if [ $# -lt 2 ]; then
+    >&2 echo "call: Not enough arguments"
+    exit 1
+  fi
+  cmd="$1"
+  name="$2"
+  arguments=( "${@:3}" )
+  args=""
+  case "${cmd}" in
+    call)
+      name="easy_terminal#Tapi_${name}"
+      args="["
+      for a in "${arguments[@]}"; do
+        args+="\"${a}\", "
+      done
+      args+="]"
+      ;;
+    drop)
+      name="$(realpath "${name}")"
+      args="{${arguments[*]}}"
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+
+  printf ']51;["%s", "%s", %s]' "${cmd}" "${name}" "${args}"
+}
+
+# main
+function tovim() {
+  if [ -z ${VIM_TERMINAL:+NotInVim} ]; then
+    >&2 echo "${script}: You are not in vim."
+    exit 1
+  fi
+  if [ $# -lt 1 ]; then
+    >&2 echo "${script}: Need a command."
+  fi
+
+  case "$1" in
+    "help") usage ;;
+    "set") set_terminal_bufnr ;;
+    "cd") change_directory "${@:2}" ;;
+    "vs") split 'v' "${@:2}" ;;
+    "sp") split 's' "${@:2}" ;;
+    "make") make "${@:2}" ;;
+    *) 
+      >&2 echo "${script}: Not a command."
+      exit 1 ;;
+  esac
+}
+
+tovim "$@"

@@ -1,0 +1,21 @@
+*easy_terminal.txt*	For Vim version 8.2.	Last change: 2020 Aug 14
+
+                   Easy Terminal		by Beomjoon Goh
+
+
+
+1. Introduction
+2. Commands
+3. Mappings
+4. Communication
+    4.1. Vim to terminal
+    4.2. Terminal to vim
+5. Settings
+    5.1. Summary
+    5.2. Details
+6. Licence
+7. Bugs
+8. Credits
+9. Changelog
+
+==============================================================================
