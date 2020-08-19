@@ -4,12 +4,11 @@ endif
 let g:loaded_easy_terminal_plugin = 1
 
 function! s:SetCommands() abort
-  let l:bashrc_file = expand("<sfile>:p:h:h") . '/script/setup_bash.sh'
+  let l:script_dir = expand("<sfile>:p:h:h") . '/script'
   let l:default_commands = {
-      \ 'bash' : 'bash --rcfile '.l:bashrc_file,
-      \ 'py'   : 'python3',
+      \ 'bash' : 'bash --rcfile '.l:script_dir.'/setup_bash.sh',
+      \ 'py3'  : 'python3 -i '.l:script_dir.'/setup_python.py',
       \ 'ex'   : 'vim -e',
-      \ 'plot' : 'gnuplot'
       \}
   let l:commands = get(g:, 'easy_terminal_commands', l:default_commands)
   for l:prog in keys(l:default_commands)

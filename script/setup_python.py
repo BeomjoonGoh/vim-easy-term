@@ -16,6 +16,7 @@ class ToVim():
         print(inspect.cleandoc(self.__doc__))
 
     def set(self):
+        print("Setting this terminal buffer as primary.")
         self._send("call", "set_terminal_bufnr")
 
     def _send(self, cmd, name, args = []):
@@ -25,7 +26,7 @@ class ToVim():
         elif cmd == "drop":
             fullname = os.path.abspath(name)
             arguments = '{' + ' '.join(args) +'}'
-        print('\033]51;["{}", "{}", {}]\007'.format(cmd, fullname, arguments))
+        print('\033]51;["{}", "{}", {}]\007'.format(cmd, fullname, arguments), end='')
 
 tovim = ToVim()
 
