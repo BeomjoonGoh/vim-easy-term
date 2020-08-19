@@ -75,7 +75,7 @@ function! easy_terminal#SendText(mode) abort
 
   let l:ftype = getbufvar("%", '&filetype')
   if l:ftype == 'vim'
-    let l:text = substitute(l:text, '\m\n\+', "\n", 'g')
+    let l:text = s:ProcessVimscript(l:text)
   elseif l:ftype == 'python'
     let l:text = s:ProcessPython(l:text)
   endif
@@ -154,6 +154,14 @@ function! easy_terminal#Tapi_make(bufnr, arglist) abort
 endfunction
 
 " local function
+function! s:ProcessVimscript(code) abort
+  " Remove line-continuation-comment ("\ ) then remove line-continuation (\)
+  return split(a:code, '\m\n\+')->
+      \filter({idx, val -> match(val, '\m^\s*"\\ ')})->
+      \join("\n")->
+      \substitute('\m\n\s*\\\s*', " ", 'g') . "\n"
+endfunction
+
 function! s:ProcessPython(code) abort
   let l:text = ""
   let l:previous_indent = 0
@@ -166,7 +174,6 @@ function! s:ProcessPython(code) abort
     endif
     let l:previous_indent = l:current_indent
   endfor
-  echom l:text
   return l:previous_indent ? l:text."\n" : l:text
 endfunction
 
@@ -182,7 +189,7 @@ endfunction
 
 function! s:CalculateMin(expr, lim) abort
   let l:e = split(a:expr, ',')
-  call map(l:e, {_, val -> (val =~ '\m%$') ? a:lim * str2nr(val[:-2]) / 100 : str2nr(val) })
+  call map(l:e, {_, val -> (val =~ '%$') ? a:lim * str2nr(val[:-2]) / 100 : str2nr(val) })
   return min(l:e)
 endfunction
 
