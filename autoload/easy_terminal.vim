@@ -8,32 +8,27 @@ set cpo&vim
 
 let s:terminal_bufnr = -1
 
-function! easy_terminal#Open(type, prog) abort
+function! easy_terminal#Open(mods, bang, prog) abort
   let l:term_options = {
       \ 'term_finish' : 'close',
       \ 'term_api' : 'easy_terminal#Tapi_',
+      \ 'curwin' : a:bang,
       \}
-  if     a:type == 'botright'
+  if a:mods =~ '\m\(botright\)\|\(topleft\)'
     call s:DefineWinfixAugroup(g:easy_terminal_winfix)
-    let l:term_options['term_rows'] = s:CalculateMin(g:easy_terminal_rows, &lines)
-  elseif a:type == 'vertical'
-    call s:DefineWinfixAugroup(g:easy_terminal_winfix)
-    let l:term_options['term_cols'] = s:CalculateMin(g:easy_terminal_cols, &columns)
-  elseif a:type == 'new'
-    call s:DeleteWinfixAugroup(g:easy_terminal_winfix)
-    let l:term_options['curwin'] = 1
-  elseif a:type == 'tab'
-    call s:DeleteWinfixAugroup(g:easy_terminal_winfix)
+    if a:mods =~ 'vertical'
+      let l:term_options['term_cols'] = s:CalculateMin(g:easy_terminal_cols, &columns)
+    else
+      let l:term_options['term_rows'] = s:CalculateMin(g:easy_terminal_rows, &lines)
+    endif
   else
-    return 1
+    call s:DeleteWinfixAugroup(g:easy_terminal_winfix)
   endif
 
-  let l:p = empty(a:prog) ? 'bash' : a:prog
-  let l:cmd = get(g:easy_terminal_commands, l:p, l:p)
-  let l:term_options['term_name'] = '[Terminal] '.l:p
+  let l:cmd = get(g:easy_terminal_commands, a:prog, a:prog)
+  let l:term_options['term_name'] = '[Terminal] '.l:cmd->split()[0]
 
-  let l:prefix = (a:type == 'new') ? '' : a:type
-  execute l:prefix 'call term_start("'.l:cmd.'", l:term_options)'
+  execute a:mods 'call term_start("'.l:cmd.'", l:term_options)'
   let s:terminal_bufnr = term_list()[0]
 
   augroup easy_terminal_close
@@ -120,6 +115,10 @@ function! easy_terminal#GetBufnr() abort
   return s:terminal_bufnr
 endfunction
 
+function! easy_terminal#Complete(A,L,P) abort
+  return join(keys(g:easy_terminal_commands),"\n")
+endfunction
+
 " terminal-api
 function! easy_terminal#Tapi_set_terminal_bufnr(bufnr, arglist) abort
   let s:terminal_bufnr = a:bufnr
@@ -189,7 +188,7 @@ endfunction
 
 function! s:CalculateMin(expr, lim) abort
   let l:e = split(a:expr, ',')
-  call map(l:e, {_, val -> (val =~ '%$') ? a:lim * str2nr(val[:-2]) / 100 : str2nr(val) })
+  call map(l:e, { _, val -> (val =~ '%$') ? a:lim * str2nr(val[:-2]) / 100 : str2nr(val) })
   return min(l:e)
 endfunction
 
