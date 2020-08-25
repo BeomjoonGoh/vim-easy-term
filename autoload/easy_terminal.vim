@@ -25,7 +25,7 @@ function! easy_terminal#Open(mods, bang, prog) abort
     call s:DeleteWinfixAugroup(g:easy_terminal_winfix)
   endif
 
-  let l:cmd = get(g:easy_terminal_commands, a:prog, a:prog)
+  let l:cmd = get(g:easy_terminal_alias, a:prog, a:prog)
   let l:term_options['term_name'] = '[Terminal] '.l:cmd->split()[0]
 
   execute a:mods 'call term_start("'.l:cmd.'", l:term_options)'
@@ -116,7 +116,7 @@ function! easy_terminal#GetBufnr() abort
 endfunction
 
 function! easy_terminal#Complete(A,L,P) abort
-  return join(keys(g:easy_terminal_commands),"\n")
+  return join(keys(g:easy_terminal_alias),"\n")
 endfunction
 
 " terminal-api
