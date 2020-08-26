@@ -5,27 +5,66 @@
 
 
 1. Introduction
-2. Commands and Mappings
-4. Communication
-   4.1. Vim to terminal
-   4.2. Terminal to vim
-5. Settings
-6. Licence
-7. Bugs
-8. Credits
-9. Changelog
+2. Usage
+	Commands
+	Mappings
+3. Communication
+	Vim to terminal
+	Terminal to vim
+4. Settings
+5. License
+6. Bugs
+7. Credits
+8. Changelog
 
 ==============================================================================
+1. Introduction					*easy_terminal_introduction*
+
 
 ==============================================================================
-2. Commands and Mappings			*easy_terminal_commands*
-						*easy_terminal_mappings*
+2. Usage					*easy_terminal_usage*
 
-COMMANDS
+Commands~
 								*:Term*
 :Term[!] [{cmd}]
+	Split Opens a vim terminal emulator window running {cmd}.  The {cmd}
+	is tested whether it is an alias or a command.  If given argument is
+	found in the dictionary key list, the value of |easy_terminal_alias|
+	is passed to |term_start()| function.  Otherwise, the whole argument
+	is passed.  If {cmd} is not given, the value of empty key is used.
 
-MAPPINGS
+	When [!] is added, opens the terminal window using the current window
+	if it is possible instead of splitting.
+
+	Any <mods> for split window can be used such as |:vertical|.  If
+	<mods> that forcibly takes full width or height is given,
+	|easy_terminal_rows| or |easy_terminal_cols| is used to calculate
+	corresponding minimum height or width.
+
+	Usage Examples: >
+		:Term
+		:Term bash
+		:vertical Term python3 -i myprogram.py
+<	
+	After the terminal job is finished, the window is automatically
+	closed (|term++close|).
+
+	"term_name" is set as `[Terminal] word` using the first word of {cmd}.
+
+	Internally stores the most recent terminal buffer number for public
+	functions and mappings.  To change the number to a different terminal,
+	use |easy_terminal#Tapi_set_terminal_bufnr()| via terminal-vim
+	communication.
+
+	Tab completion is supported with keys of |easy_terminal_alias|.  If
+	you want to define additional commands with completion, for example
+	`Tterm` that opens a terminal window in a new tab, put this in your
+	vimrc file: >
+		:command! -nargs=? -complete=custom,easy_terminal#Complete
+				\ Tterm tab Term <args>
+<
+Mappings~
+						*easy_terminal_mappings*
 
 n <Plug>EasyTermCdVim
 t <Plug>EasyTermCdTerm
@@ -35,7 +74,11 @@ t <Plug>EasyTermYankLast
 n <Plug>EasyTermPutLast
 
 ==============================================================================
-5. Settings					*easy_terminal_settings*
+3. Communication				*easy_terminal_communication*
+
+
+==============================================================================
+4. Settings					*easy_terminal_settings*
 
 				*easy_terminal_rows* *easy_terminal_cols*
 |g:easy_terminal_rows|		string (default: "15,18%")
@@ -57,16 +100,12 @@ n <Plug>EasyTermPutLast
 
 	When on, if |:Term| command has <mods> that uses |easy_terminal_rows|
 	or |easy_terminal_cols|, locally sets 'winfixheight' and 'winfixwidth'
-	and make already open windows (almost) equaally high and wide.
+	and make already open windows (almost) equally high and wide.
 
 							*easy_terminal_alias*
 |g:easy_terminal_alias|		Dictionary (default: see below)
 
-	Dictionary of {alias} and {cmd} pairs for |:Term| command.  The
-	argument of |:Term| is tested whether it is an alias or command.  If
-	given argument is found in the dictionary key list, the value of
-	|easy_terminal_alias| is passed to |term_start()| function.
-	Otherwise, the whole argument is passed.
+	Dictionary of {alias} and {cmd} pairs for |:Term| command.
 	The default aliases are: >
 		{
 		\ ''     : 'bash --rcfile scripts/setup_bash.sh',
@@ -75,7 +114,7 @@ n <Plug>EasyTermPutLast
 		\ 'ex'   : 'vim -e'
 		}
 <
-	The empty key is used for the default invokation of |:Term| command.
+	The empty key is used for the default invocation of |:Term| command.
 
 	To overwrite an alias or add a new one, use any Dictionary
 	modification method (|dict-modification|).  Example: >
@@ -84,5 +123,13 @@ n <Plug>EasyTermPutLast
 		or
 		:let g:easy_terminal_alias = { 'zsh' : 'zsh -i' }
 <
+==============================================================================
+5. License	
+==============================================================================
+6. Bugs	
+==============================================================================
+7. Credits	
+==============================================================================
+8. Changelog	
 
  vim:tw=78:ts=8:noet:ft=help:norl:sw=8:sts=8:
