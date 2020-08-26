@@ -116,7 +116,9 @@ function! easy_terminal#GetBufnr() abort
 endfunction
 
 function! easy_terminal#Complete(A,L,P) abort
-  return join(keys(g:easy_terminal_alias),"\n")
+  let l:k = keys(g:easy_terminal_alias)
+  call remove(l:k, get(l:k, ""))
+  return join(l:k,"\n")
 endfunction
 
 " terminal-api
