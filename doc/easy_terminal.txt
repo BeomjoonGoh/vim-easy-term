@@ -1,21 +1,88 @@
 *easy_terminal.txt*	For Vim version 8.2.	Last change: 2020 Aug 14
 
-                   Easy Terminal		by Beomjoon Goh
+		   Easy Terminal		by Beomjoon Goh
 
 
 
 1. Introduction
-2. Commands
-3. Mappings
+2. Commands and Mappings
 4. Communication
-    4.1. Vim to terminal
-    4.2. Terminal to vim
+   4.1. Vim to terminal
+   4.2. Terminal to vim
 5. Settings
-    5.1. Summary
-    5.2. Details
 6. Licence
 7. Bugs
 8. Credits
 9. Changelog
 
 ==============================================================================
+
+==============================================================================
+2. Commands and Mappings			*easy_terminal_commands*
+						*easy_terminal_mappings*
+
+COMMANDS
+								*:Term*
+:Term[!] [{cmd}]
+
+MAPPINGS
+
+n <Plug>EasyTermCdVim
+t <Plug>EasyTermCdTerm
+n <Plug>EasyTermSendText
+v <Plug>EasyTermSendText
+t <Plug>EasyTermYankLast
+n <Plug>EasyTermPutLast
+
+==============================================================================
+5. Settings					*easy_terminal_settings*
+
+				*easy_terminal_rows* *easy_terminal_cols*
+|g:easy_terminal_rows|		string (default: "15,18%")
+|g:easy_terminal_cols|		string (default: "150,40%")
+
+	A comma separated list of number of lines/columns, percentage of
+	number of lines/columns respect to 'line'/'column'.  If both number
+	and percentage is given, minimum of the two is used.  This is used
+	when |:Term| command has <mods> that opens a window with full width or
+	height of the Vim window.  (|:topleft|, |:botright|).  Example: >
+		:let g:easy_terminal_cols = "150"
+		:vertical botright Term bash -l
+<
+	Opens a vertically split, full-height and 150 column wide vim terminal
+	emulator window running bash with a login shell option.
+
+							*easy_terminal_winfix*
+|g:easy_terminal_winfix|	boolean (default: 1)
+
+	When on, if |:Term| command has <mods> that uses |easy_terminal_rows|
+	or |easy_terminal_cols|, locally sets 'winfixheight' and 'winfixwidth'
+	and make already open windows (almost) equaally high and wide.
+
+							*easy_terminal_alias*
+|g:easy_terminal_alias|		Dictionary (default: see below)
+
+	Dictionary of {alias} and {cmd} pairs for |:Term| command.  The
+	argument of |:Term| is tested whether it is an alias or command.  If
+	given argument is found in the dictionary key list, the value of
+	|easy_terminal_alias| is passed to |term_start()| function.
+	Otherwise, the whole argument is passed.
+	The default aliases are: >
+		{
+		\ ''     : 'bash --rcfile scripts/setup_bash.sh',
+		\ 'bash' : 'bash --rcfile scripts/setup_bash.sh',
+		\ 'py3'  : 'python3 -i scripts/setup_python.py',
+		\ 'ex'   : 'vim -e'
+		}
+<
+	The empty key is used for the default invokation of |:Term| command.
+
+	To overwrite an alias or add a new one, use any Dictionary
+	modification method (|dict-modification|).  Example: >
+		:let g:easy_terminal_alias = {}
+		:let g:easy_terminal_alias['zsh'] = 'zsh -i'
+		or
+		:let g:easy_terminal_alias = { 'zsh' : 'zsh -i' }
+<
+
+ vim:tw=78:ts=8:noet:ft=help:norl:sw=8:sts=8:

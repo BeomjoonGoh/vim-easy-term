@@ -1,1 +1,5 @@
 easy_terminal.txt	easy_terminal.txt	/*easy_terminal.txt*
+easy_terminal_cols	easy_terminal.txt	/*easy_terminal_cols*
+easy_terminal_rows	easy_terminal.txt	/*easy_terminal_rows*
+easy_terminal_settings	easy_terminal.txt	/*easy_terminal_settings*
+easy_terminal_winfix	easy_terminal.txt	/*easy_terminal_winfix*
