@@ -1,5 +1,11 @@
+:Term	easy_terminal.txt	/*:Term*
 easy_terminal.txt	easy_terminal.txt	/*easy_terminal.txt*
+easy_terminal_alias	easy_terminal.txt	/*easy_terminal_alias*
 easy_terminal_cols	easy_terminal.txt	/*easy_terminal_cols*
+easy_terminal_communication	easy_terminal.txt	/*easy_terminal_communication*
+easy_terminal_introduction	easy_terminal.txt	/*easy_terminal_introduction*
+easy_terminal_mappings	easy_terminal.txt	/*easy_terminal_mappings*
 easy_terminal_rows	easy_terminal.txt	/*easy_terminal_rows*
 easy_terminal_settings	easy_terminal.txt	/*easy_terminal_settings*
+easy_terminal_usage	easy_terminal.txt	/*easy_terminal_usage*
 easy_terminal_winfix	easy_terminal.txt	/*easy_terminal_winfix*
