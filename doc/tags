@@ -1,4 +1,9 @@
 :Term	easy_terminal.txt	/*:Term*
+<Plug>(EasyTermCdTerm)	easy_terminal.txt	/*<Plug>(EasyTermCdTerm)*
+<Plug>(EasyTermCdVim)	easy_terminal.txt	/*<Plug>(EasyTermCdVim)*
+<Plug>(EasyTermPutLast)	easy_terminal.txt	/*<Plug>(EasyTermPutLast)*
+<Plug>(EasyTermSendText)	easy_terminal.txt	/*<Plug>(EasyTermSendText)*
+<Plug>(EasyTermYankLast)	easy_terminal.txt	/*<Plug>(EasyTermYankLast)*
 easy_terminal.txt	easy_terminal.txt	/*easy_terminal.txt*
 easy_terminal_alias	easy_terminal.txt	/*easy_terminal_alias*
 easy_terminal_cols	easy_terminal.txt	/*easy_terminal_cols*
@@ -9,3 +14,4 @@ easy_terminal_rows	easy_terminal.txt	/*easy_terminal_rows*
 easy_terminal_settings	easy_terminal.txt	/*easy_terminal_settings*
 easy_terminal_usage	easy_terminal.txt	/*easy_terminal_usage*
 easy_terminal_winfix	easy_terminal.txt	/*easy_terminal_winfix*
+help-tags	tags	1

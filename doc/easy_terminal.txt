@@ -4,14 +4,14 @@
 
 
 
-1. Introduction
-2. Usage
+1. Introduction					|easy_terminal_introduction|
+2. Usage					|easy_terminal_usage|
 	Commands
-	Mappings
-3. Communication
+	Mappings				|easy_terminal_mappings|
+3. Communication				|easy_terminal_communication|
 	Vim to terminal
 	Terminal to vim
-4. Settings
+4. Settings					|easy_terminal_settings|
 5. License
 6. Bugs
 7. Credits
@@ -22,11 +22,12 @@
 
 
 ==============================================================================
-2. Usage					*easy_terminal_usage*
+2. Usage						*easy_terminal_usage*
 
 Commands~
 								*:Term*
 :Term[!] [{cmd}]
+
 	Split Opens a vim terminal emulator window running {cmd}.  The {cmd}
 	is tested whether it is an alias or a command.  If given argument is
 	found in the dictionary key list, the value of |easy_terminal_alias|
@@ -66,12 +67,82 @@ Commands~
 Mappings~
 						*easy_terminal_mappings*
 
-n <Plug>EasyTermCdVim
-t <Plug>EasyTermCdTerm
-n <Plug>EasyTermSendText
-v <Plug>EasyTermSendText
-t <Plug>EasyTermYankLast
-n <Plug>EasyTermPutLast
+This plugin defines the following <Plug> mappings:
+
+{mod} {rhs}                    Description~
+------------------------------------------------------------------------
+ n,x  |<Plug>(EasyTermSendText)| Send a line or selected text to terminal
+ n    |<Plug>(EasyTermPutLast)|  Paste last output of terminal to buffer
+ t    |<Plug>(EasyTermYankLast)| Yank last output of terminal
+ n    |<Plug>(EasyTermCdVim)|    Change cwd of vim & shell to buffer's dir
+ t    |<Plug>(EasyTermCdTerm)|   Change cwd of shell to vim's cwd
+
+To use any of the <Plug> mapping, add the following in your vimrc:
+	{mod}map {lhs} {rhs}
+NOTE do not use `noremap`.  Example: >
+	:nmap <Leader>p <Plug>(EasyTermPutLast)
+<
+						*<Plug>(EasyTermSendText)*
+<Plug>(EasyTermSendText)	mode: normal(n), visual(x)
+
+	Sends current line(n) or visually selected text(x) to terminal buffer.
+	It is useful to test sections of a shell, python or vim script as you
+	write so that the terminal buffer acts as a (crude) REPL enviroment.
+
+	If current buffer's 'filetype' is python or vim, the text is treated
+	so that `python` or `ex` gives in the expected behavior.  For example,
+	in a python script, >
+		if 'a' == 'b':
+		    print("a is b")
+		print(1 + 2)
+<
+	which would run without a problem, if all three lines were sent
+	literally to a terminal buffer it would say, >
+		>>> if 'a' == 'b':
+		...     print("a is b")
+		... print(1 + 2)
+		  File "<stdin>", line 3
+		    print(1 + 2)
+		    ^
+		SyntaxError: invalid syntax
+		>>> 
+<
+	Since `python` expects a new line character after and of an indented
+	block such as class, def, for, and if-else.  Likewise, `ex` gives an
+	error when empty line is entered or line-continuation exists.
+	|<Plug>(EasyTermSendText)| takes care of (most of) these cases.
+
+         					*<Plug>(EasyTermPutLast)*
+<Plug>(EasyTermPutLast)		mode: normal(n)
+
+	Pastes last output of terminal buffer to current buffer before cursor
+	position.  The last output is obtained by first guessing prompt and
+	search the next previous occurrence of the guessed prompt then yanking
+	all lines in between.
+
+	There are many edge cases so please don't expect it would always work.
+	For example, whenever PS2 exists, those lines with PS2 will be yanked
+	as well.  Use Terminal-Normal mode instead.  See |Terminal-mode|, and
+	|t_CTRL-W_N|
+
+         					*<Plug>(EasyTermYankLast)*
+<Plug>(EasyTermYankLast)	mode: terminal(t)
+
+	Yanks last output of terminal buffer to the unnamed register "".
+	Has the same problem as |<Plug>(EasyTermPutLast)|.
+
+         					*<Plug>(EasyTermCdVim)*
+<Plug>(EasyTermCdVim)		mode: normal(n)
+
+	Change directory of vim and terminal to current buffer's directory if
+	terminal is running interactive shell that has `cd` command.
+
+         					*<Plug>(EasyTermCdTerm)*
+<Plug>(EasyTermCdTerm)		mode: terminal(t)
+
+	Change directory of terminal, running interactive shell that has `cd`
+	command, to vim's cwd.
+
 
 ==============================================================================
 3. Communication				*easy_terminal_communication*
@@ -81,8 +152,8 @@ n <Plug>EasyTermPutLast
 4. Settings					*easy_terminal_settings*
 
 				*easy_terminal_rows* *easy_terminal_cols*
-|g:easy_terminal_rows|		string (default: "15,18%")
-|g:easy_terminal_cols|		string (default: "150,40%")
+g:easy_terminal_rows		string (default: "15,18%")
+g:easy_terminal_cols		string (default: "150,40%")
 
 	A comma separated list of number of lines/columns, percentage of
 	number of lines/columns respect to 'line'/'column'.  If both number
@@ -96,14 +167,14 @@ n <Plug>EasyTermPutLast
 	emulator window running bash with a login shell option.
 
 							*easy_terminal_winfix*
-|g:easy_terminal_winfix|	boolean (default: 1)
+g:easy_terminal_winfix		boolean (default: 1)
 
 	When on, if |:Term| command has <mods> that uses |easy_terminal_rows|
 	or |easy_terminal_cols|, locally sets 'winfixheight' and 'winfixwidth'
 	and make already open windows (almost) equally high and wide.
 
 							*easy_terminal_alias*
-|g:easy_terminal_alias|		Dictionary (default: see below)
+g:easy_terminal_alias		Dictionary (default: see below)
 
 	Dictionary of {alias} and {cmd} pairs for |:Term| command.
 	The default aliases are: >

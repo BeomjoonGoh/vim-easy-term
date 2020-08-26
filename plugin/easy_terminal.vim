@@ -28,9 +28,9 @@ let g:easy_terminal_alias  = s:SetAlias()
 command! -bang -nargs=? -complete=custom,easy_terminal#Complete Term call easy_terminal#Open("<mods>", <bang>0, <q-args>)
 
 " key maps
-nnoremap <silent> <Plug>EasyTermCdVim :call easy_terminal#CdVim()<CR>
-tnoremap <silent> <Plug>EasyTermCdTerm <C-w>:call easy_terminal#CdTerm()<CR>
-nnoremap <silent> <Plug>EasyTermSendText :call easy_terminal#SendText('n')<CR>
-vnoremap <silent> <Plug>EasyTermSendText :<C-u>call easy_terminal#SendText('v')<CR>
-tnoremap <silent> <Plug>EasyTermYankLast <C-w>:call easy_terminal#YankLastOutput()<CR>
-nnoremap <silent> <Plug>EasyTermPutLast :call easy_terminal#PutLastOutput()<CR>
+nnoremap <silent> <Plug>(EasyTermSendText) :call easy_terminal#SendText()<CR>
+xnoremap <silent> <Plug>(EasyTermSendText) :<C-u>call easy_terminal#SendText('v')<CR>
+nnoremap <silent> <Plug>(EasyTermPutLast) :call easy_terminal#PutLastOutput()<CR>
+tnoremap <silent> <Plug>(EasyTermYankLast) <C-w>:call easy_terminal#YankLastOutput()<CR>
+nnoremap <silent> <Plug>(EasyTermCdVim) :call easy_terminal#CdVim()<CR>
+tnoremap <silent> <Plug>(EasyTermCdTerm) <C-w>:call easy_terminal#CdTerm()<CR>

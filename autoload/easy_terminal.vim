@@ -50,23 +50,16 @@ function! easy_terminal#CdTerm() abort
 endfunction
 
 function! easy_terminal#CdVim() abort
-  let l:oldcwd = getcwd()
   cd %:p:h
-  if l:oldcwd != getcwd()
-    call easy_terminal#CdTerm()
-  endif
+  call easy_terminal#CdTerm()
 endfunction
 
-function! easy_terminal#SendText(mode) abort
+function! easy_terminal#SendText(...) abort
   if getbufvar(s:terminal_bufnr, '&buftype') != 'terminal'
     return
   endif
 
-  if a:mode == 'n'
-    let l:text = substitute(getline("."), '\m$', "\n", '')
-  elseif a:mode == 'v'
-    let l:text = s:GetSelectedText() 
-  endif
+  let l:text = get(a:,1,'') == 'v' ? s:GetSelectedText() : getline(".")."\n"
 
   let l:ftype = getbufvar("%", '&filetype')
   if l:ftype == 'vim'
@@ -164,6 +157,7 @@ function! s:ProcessVimscript(code) abort
 endfunction
 
 function! s:ProcessPython(code) abort
+  " elseif, else not working!
   let l:text = ""
   let l:previous_indent = 0
   for l:line in split(a:code, '\m\n\+')
