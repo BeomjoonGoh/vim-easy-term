@@ -65,7 +65,7 @@ function make() {
   send call "${FUNCNAME[0]}" "$@"
 }
 
-function set_terminal_bufnr() {
+function set_term_bufnr() {
   send call "${FUNCNAME[0]}"
 }
 
@@ -80,7 +80,7 @@ function send() {
   args=""
   case "${cmd}" in
     call)
-      name="easy_terminal#Tapi_${name}"
+      name="easy_term#Tapi_${name}"
       args="["
       for a in "${arguments[@]}"; do
         args+="\"${a}\", "
@@ -111,7 +111,7 @@ function tovim() {
 
   case "$1" in
     "help") usage ;;
-    "set") set_terminal_bufnr ;;
+    "set") set_term_bufnr ;;
     "cd") change_directory "${@:2}" ;;
     "vs") split 'v' "${@:2}" ;;
     "sp") split 's' "${@:2}" ;;

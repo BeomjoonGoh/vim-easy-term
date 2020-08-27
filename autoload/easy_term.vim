@@ -1,61 +1,61 @@
-if exists("g:loaded_easy_terminal") || !has('terminal')
+if exists("g:loaded_easy_term") || !has('terminal')
   finish
 endif
-let g:loaded_easy_terminal = 1
+let g:loaded_easy_term = 1
 
 let s:cpo_save = &cpo
 set cpo&vim
 
-let s:terminal_bufnr = -1
+let s:term_bufnr = -1
 
-function! easy_terminal#Open(mods, bang, prog) abort
+function! easy_term#Open(mods, bang, prog) abort
   let l:term_options = {
       \ 'term_finish' : 'close',
-      \ 'term_api' : 'easy_terminal#Tapi_',
+      \ 'term_api' : 'easy_term#Tapi_',
       \ 'curwin' : a:bang,
       \}
   if a:mods =~ '\m\(botright\)\|\(topleft\)'
-    call s:DefineWinfixAugroup(g:easy_terminal_winfix)
+    call s:DefineWinfixAugroup(g:easy_term_winfix)
     if a:mods =~ 'vertical'
-      let l:term_options['term_cols'] = s:CalculateMin(g:easy_terminal_cols, &columns)
+      let l:term_options['term_cols'] = s:CalculateMin(g:easy_term_cols, &columns)
     else
-      let l:term_options['term_rows'] = s:CalculateMin(g:easy_terminal_rows, &lines)
+      let l:term_options['term_rows'] = s:CalculateMin(g:easy_term_rows, &lines)
     endif
   else
-    call s:DeleteWinfixAugroup(g:easy_terminal_winfix)
+    call s:DeleteWinfixAugroup(g:easy_term_winfix)
   endif
 
-  let l:cmd = get(g:easy_terminal_alias, a:prog, a:prog)
-  let l:term_options['term_name'] = '[Terminal] '.l:cmd->split()[0]
+  let l:cmd = get(g:easy_term_alias, a:prog, a:prog)
+  let l:term_options['term_name'] = '[Term] '.l:cmd->split()[0]
 
   execute a:mods 'call term_start("'.l:cmd.'", l:term_options)'
-  let s:terminal_bufnr = term_list()[0]
+  let s:term_bufnr = term_list()[0]
 
-  augroup easy_terminal_close
+  augroup easy_term_close
     autocmd!
     autocmd BufWinLeave *
         \ if &buftype == 'terminal' |
-        \   call s:UpdateTerminalBufnr() |
+        \   call s:UpdateTermBufnr() |
         \ endif
   augroup END
 endfunction
 
-function! easy_terminal#CdTerm() abort
-  if getbufvar(s:terminal_bufnr, '&buftype') != 'terminal'
+function! easy_term#CdTerm() abort
+  if getbufvar(s:term_bufnr, '&buftype') != 'terminal'
     return
   endif
 
   let l:cmd = "cd " . fnameescape(getcwd()) . "\<CR>"
-  call term_sendkeys(s:terminal_bufnr, l:cmd)
+  call term_sendkeys(s:term_bufnr, l:cmd)
 endfunction
 
-function! easy_terminal#CdVim() abort
+function! easy_term#CdVim() abort
   cd %:p:h
-  call easy_terminal#CdTerm()
+  call easy_term#CdTerm()
 endfunction
 
-function! easy_terminal#SendText(...) abort
-  if getbufvar(s:terminal_bufnr, '&buftype') != 'terminal'
+function! easy_term#SendText(...) abort
+  if getbufvar(s:term_bufnr, '&buftype') != 'terminal'
     return
   endif
 
@@ -68,11 +68,11 @@ function! easy_terminal#SendText(...) abort
     let l:text = s:ProcessPython(l:text)
   endif
 
-  call term_sendkeys(s:terminal_bufnr, l:text)
+  call term_sendkeys(s:term_bufnr, l:text)
 endfunction
 
-function! easy_terminal#YankLastOutput() abort
-  if getbufvar(s:terminal_bufnr, '&buftype') != 'terminal'
+function! easy_term#YankLastOutput() abort
+  if getbufvar(s:term_bufnr, '&buftype') != 'terminal'
     return
   endif
   " More sophisticated method for prompt?
@@ -80,58 +80,58 @@ function! easy_terminal#YankLastOutput() abort
   " $ ps -p $PID -o comm=  -> process name
   " $ pgrep -P $PID      -> child pid list
   " user_dictionary = { 'child_process_name': 'regex_prompt', ... }
-  " let l:prompt = haskey() ? user_dictionary["child_process_name"] : term_getline(s:terminal_bufnr, '.')[-2:-1]
+  " let l:prompt = haskey() ? user_dictionary["child_process_name"] : term_getline(s:term_bufnr, '.')[-2:-1]
   call feedkeys("\<C-w>N", 'n')
   call cursor(line('$'), 1)
-  let l:prompt = term_getline(s:terminal_bufnr, ".")[-2:-1]
+  let l:prompt = term_getline(s:term_bufnr, ".")[-2:-1]
   let l:start = search(l:prompt, 'bW') + 1
   let l:end = line('$') - 1
   call feedkeys("i", 'n')
-  call setreg('"', getbufline(s:terminal_bufnr, l:start, l:end))
+  call setreg('"', getbufline(s:term_bufnr, l:start, l:end))
 endfunction
 
-function! easy_terminal#PutLastOutput() abort
-  if getbufvar(s:terminal_bufnr, '&buftype') != 'terminal'
+function! easy_term#PutLastOutput() abort
+  if getbufvar(s:term_bufnr, '&buftype') != 'terminal'
     return
   endif
 
-  execute bufwinnr(s:terminal_bufnr).'wincmd w'
-  call easy_terminal#YankLastOutput()
+  execute bufwinnr(s:term_bufnr).'wincmd w'
+  call easy_term#YankLastOutput()
   wincmd p
   normal! P
 endfunction
 
-function! easy_terminal#GetBufnr() abort
-  if index(term_list(), s:terminal_bufnr) == -1
+function! easy_term#GetBufnr() abort
+  if index(term_list(), s:term_bufnr) == -1
     return -1
   endif
-  return s:terminal_bufnr
+  return s:term_bufnr
 endfunction
 
-function! easy_terminal#Complete(A,L,P) abort
-  let l:k = keys(g:easy_terminal_alias)
+function! easy_term#Complete(A,L,P) abort
+  let l:k = keys(g:easy_term_alias)
   call remove(l:k, get(l:k, ""))
   return join(l:k,"\n")
 endfunction
 
 " terminal-api
-function! easy_terminal#Tapi_set_terminal_bufnr(bufnr, arglist) abort
-  let s:terminal_bufnr = a:bufnr
-  echomsg "This terminal(" . s:terminal_bufnr . ") is now set to s:terminal_bufnr."
+function! easy_term#Tapi_set_term_bufnr(bufnr, arglist) abort
+  let s:term_bufnr = a:bufnr
+  echomsg "This terminal(" . s:term_bufnr . ") is now set to s:term_bufnr."
 endfunction
 
-function! easy_terminal#Tapi_change_directory(bufnr, arglist) abort
+function! easy_term#Tapi_change_directory(bufnr, arglist) abort
   let l:cwd = join(a:arglist[:-2], " ")
   let l:do_cd = a:arglist[-1]
   if getcwd() != l:cwd
     execute 'cd' l:cwd
   endif
   if l:do_cd
-    call easy_terminal#CdTerm()
+    call easy_term#CdTerm()
   endif
 endfunction
 
-function! easy_terminal#Tapi_split(bufnr, arglist) abort
+function! easy_term#Tapi_split(bufnr, arglist) abort
   if a:arglist[0] != 'v' && a:arglist[0] != 's'
     return
   endif
@@ -142,7 +142,7 @@ function! easy_terminal#Tapi_split(bufnr, arglist) abort
   execute l:mode.l:cmd.l:file
 endfunction
 
-function! easy_terminal#Tapi_make(bufnr, arglist) abort
+function! easy_term#Tapi_make(bufnr, arglist) abort
   execute 'make' join(a:arglist, " ")
   botright cwindow
 endfunction
@@ -188,7 +188,7 @@ endfunction
 
 function! s:DefineWinfixAugroup(do)
   if a:do
-    augroup easy_terminal_open
+    augroup easy_term_open
       autocmd!
       autocmd TerminalOpen *
           \ if &buftype == 'terminal' |
@@ -201,17 +201,17 @@ endfunction
 
 function! s:DeleteWinfixAugroup(do) abort
   if a:do
-    augroup easy_terminal_open
+    augroup easy_term_open
       autocmd!
     augroup END
   endif
 endfunction
 
-function s:UpdateTerminalBufnr() abort
-  if len(term_list()) > 1 && term_list()[0] == s:terminal_bufnr
-    let s:terminal_bufnr = term_list()[1]
+function s:UpdateTermBufnr() abort
+  if len(term_list()) > 1 && term_list()[0] == s:term_bufnr
+    let s:term_bufnr = term_list()[1]
   else
-    let s:terminal_bufnr = -1
+    let s:term_bufnr = -1
   endif
 endfunction
 

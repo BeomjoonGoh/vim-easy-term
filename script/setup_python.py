@@ -17,11 +17,11 @@ class ToVim():
 
     def set(self):
         print("Setting this terminal buffer as primary.")
-        self._send("call", "set_terminal_bufnr")
+        self._send("call", "set_term_bufnr")
 
     def _send(self, cmd, name, args = []):
         if cmd == "call":
-            fullname = 'easy_terminal#Tapi_'+name
+            fullname = 'easy_term#Tapi_'+name
             arguments = '[' + ','.join(['"'+arg+'"' for arg in args]) + ']'
         elif cmd == "drop":
             fullname = os.path.abspath(name)

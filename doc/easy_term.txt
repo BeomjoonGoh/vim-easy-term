@@ -1,28 +1,28 @@
-*easy_terminal.txt*	For Vim version 8.2.	Last change: 2020 Aug 14
+*easy_term.txt*	For Vim version 8.2.	Last change: 2020 Aug 14
 
-		   Easy Terminal		by Beomjoon Goh
+		   Easy Term		by Beomjoon Goh
 
 
 
-1. Introduction					|easy_terminal_introduction|
-2. Usage					|easy_terminal_usage|
+1. Introduction					|easy_term_intro|
+2. Usage					|easy_term_usage|
 	Commands
-	Mappings				|easy_terminal_mappings|
-3. Communication				|easy_terminal_communication|
+	Mappings				|easy_term_mappings|
+3. Communication				|easy_term_communication|
 	Vim to terminal
 	Terminal to vim
-4. Settings					|easy_terminal_settings|
+4. Settings					|easy_term_settings|
 5. License
 6. Bugs
 7. Credits
 8. Changelog
 
 ==============================================================================
-1. Introduction					*easy_terminal_introduction*
+1. Introduction						*easy_term_intro*
 
 
 ==============================================================================
-2. Usage						*easy_terminal_usage*
+2. Usage						*easy_term_usage*
 
 Commands~
 								*:Term*
@@ -30,16 +30,16 @@ Commands~
 
 	Split Opens a vim terminal emulator window running {cmd}.  The {cmd}
 	is tested whether it is an alias or a command.  If given argument is
-	found in the dictionary key list, the value of |easy_terminal_alias|
-	is passed to |term_start()| function.  Otherwise, the whole argument
-	is passed.  If {cmd} is not given, the value of empty key is used.
+	found in the dictionary key list, the value of |easy_term_alias| is
+	passed to |term_start()| function.  Otherwise, the whole argument is
+	passed.  If {cmd} is not given, the value of empty key is used.
 
 	When [!] is added, opens the terminal window using the current window
 	if it is possible instead of splitting.
 
 	Any <mods> for split window can be used such as |:vertical|.  If
 	<mods> that forcibly takes full width or height is given,
-	|easy_terminal_rows| or |easy_terminal_cols| is used to calculate
+	|easy_term_rows| or |easy_term_cols| is used to calculate
 	corresponding minimum height or width.
 
 	Usage Examples: >
@@ -54,28 +54,28 @@ Commands~
 
 	Internally stores the most recent terminal buffer number for public
 	functions and mappings.  To change the number to a different terminal,
-	use |easy_terminal#Tapi_set_terminal_bufnr()| via terminal-vim
+	use |easy_term#Tapi_set_terminal_bufnr()| via terminal-vim
 	communication.
 
-	Tab completion is supported with keys of |easy_terminal_alias|.  If
-	you want to define additional commands with completion, for example
+	Tab completion is supported with keys of |easy_term_alias|.  If you
+	want to define additional commands with completion, for example
 	`Tterm` that opens a terminal window in a new tab, put this in your
 	vimrc file: >
-		:command! -nargs=? -complete=custom,easy_terminal#Complete
+		:command! -nargs=? -complete=custom,easy_term#Complete
 				\ Tterm tab Term <args>
 <
 Mappings~
-						*easy_terminal_mappings*
+							*easy_term_mappings*
 
 This plugin defines the following <Plug> mappings:
 
-{mod} {rhs}                    Description~
-------------------------------------------------------------------------
- n,x  |<Plug>(EasyTermSendText)| Send a line or selected text to terminal
- n    |<Plug>(EasyTermPutLast)|  Paste last output of terminal to buffer
- t    |<Plug>(EasyTermYankLast)| Yank last output of terminal
- n    |<Plug>(EasyTermCdVim)|    Change cwd of vim & shell to buffer's dir
- t    |<Plug>(EasyTermCdTerm)|   Change cwd of shell to vim's cwd
+{mod}  {rhs}                     Description~
+--------------------------------------------------------------------------
+n,x    |<Plug>(EasyTermSendText)|  Send a line or selected text to terminal
+n      |<Plug>(EasyTermPutLast)|   Paste last output of terminal to buffer
+t      |<Plug>(EasyTermYankLast)|  Yank last output of terminal
+n      |<Plug>(EasyTermCdVim)|     Change cwd of vim & shell to buffer's dir
+t      |<Plug>(EasyTermCdTerm)|    Change cwd of shell to vim's cwd
 
 To use any of the <Plug> mapping, add the following in your vimrc:
 	{mod}map {lhs} {rhs}
@@ -145,39 +145,39 @@ NOTE do not use `noremap`.  Example: >
 
 
 ==============================================================================
-3. Communication				*easy_terminal_communication*
+3. Communication				*easy_term_communication*
 
 
 ==============================================================================
-4. Settings					*easy_terminal_settings*
+4. Settings						*easy_term_settings*
 
-				*easy_terminal_rows* *easy_terminal_cols*
-g:easy_terminal_rows		string (default: "15,18%")
-g:easy_terminal_cols		string (default: "150,40%")
+						*easy_term_rows* *easy_term_cols*
+g:easy_term_rows		string (default: "15,18%")
+g:easy_term_cols		string (default: "150,40%")
 
 	A comma separated list of number of lines/columns, percentage of
 	number of lines/columns respect to 'line'/'column'.  If both number
 	and percentage is given, minimum of the two is used.  This is used
 	when |:Term| command has <mods> that opens a window with full width or
 	height of the Vim window.  (|:topleft|, |:botright|).  Example: >
-		:let g:easy_terminal_cols = "150"
+		:let g:easy_term_cols = "150"
 		:vertical botright Term bash -l
 <
 	Opens a vertically split, full-height and 150 column wide vim terminal
 	emulator window running bash with a login shell option.
 
-							*easy_terminal_winfix*
-g:easy_terminal_winfix		boolean (default: 1)
+							*easy_term_winfix*
+g:easy_term_winfix		boolean (default: 1)
 
-	When on, if |:Term| command has <mods> that uses |easy_terminal_rows|
-	or |easy_terminal_cols|, locally sets 'winfixheight' and 'winfixwidth'
-	and make already open windows (almost) equally high and wide.
+	When on, if |:Term| command has <mods> that uses |easy_term_rows| or
+	|easy_term_cols|, locally sets 'winfixheight' and 'winfixwidth' and
+	make already open windows (almost) equally high and wide.
 
-							*easy_terminal_alias*
-g:easy_terminal_alias		Dictionary (default: see below)
+							*easy_term_alias*
+g:easy_term_alias		Dictionary (default: see below)
 
-	Dictionary of {alias} and {cmd} pairs for |:Term| command.
-	The default aliases are: >
+	Dictionary of {alias} and {cmd} pairs for |:Term| command.  The
+	default aliases are: >
 		{
 		\ ''     : 'bash --rcfile scripts/setup_bash.sh',
 		\ 'bash' : 'bash --rcfile scripts/setup_bash.sh',
@@ -189,10 +189,10 @@ g:easy_terminal_alias		Dictionary (default: see below)
 
 	To overwrite an alias or add a new one, use any Dictionary
 	modification method (|dict-modification|).  Example: >
-		:let g:easy_terminal_alias = {}
-		:let g:easy_terminal_alias['zsh'] = 'zsh -i'
+		:let g:easy_term_alias = {}
+		:let g:easy_term_alias['zsh'] = 'zsh -i'
 		or
-		:let g:easy_terminal_alias = { 'zsh' : 'zsh -i' }
+		:let g:easy_term_alias = { 'zsh' : 'zsh -i' }
 <
 ==============================================================================
 5. License	
