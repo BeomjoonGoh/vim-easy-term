@@ -3,7 +3,7 @@
 		   Easy Term		by Beomjoon Goh
 
 
-
+								*easy_term*
 1. Introduction					|easy_term_intro|
 2. Usage					|easy_term_usage|
 	Commands
@@ -52,13 +52,14 @@ Commands~
 
 	"term_name" is set as `[Terminal] word` using the first word of {cmd}.
 
-	Internally stores the most recent terminal buffer number for public
-	functions and mappings.  To change the number to a different terminal,
-	use |easy_term#Tapi_set_terminal_bufnr()| via terminal-vim
-	communication.
+        Internally stores the most recent terminal buffer number for public
+        functions and mappings.  And it is referred to as "primary" terminal.
+        To change the primary terminal to a different one, use
+        |<Plug>(EasyTermSet)| mapping or |easy_term#Tapi_set_terminal_bufnr()| via
+        terminal-vim communication.
 
-	Tab completion is supported with keys of |easy_term_alias|.  If you
-	want to define additional commands with completion, for example
+	Tab completion is supported using the keys of |easy_term_alias|.  If
+	you want to define additional commands with completion, for example
 	`Tterm` that opens a terminal window in a new tab, put this in your
 	vimrc file: >
 		:command! -nargs=? -complete=custom,easy_term#Complete
@@ -76,6 +77,7 @@ n      |<Plug>(EasyTermPutLast)|   Paste last output of terminal to buffer
 t      |<Plug>(EasyTermYankLast)|  Yank last output of terminal
 n      |<Plug>(EasyTermCdVim)|     Change cwd of vim & shell to buffer's dir
 t      |<Plug>(EasyTermCdTerm)|    Change cwd of shell to vim's cwd
+t      |<Plug>(EasyTermCdSet)|     Make the current terminal primary
 
 To use any of the <Plug> mapping, add the following in your vimrc:
 	{mod}map {lhs} {rhs}
@@ -85,18 +87,18 @@ NOTE do not use `noremap`.  Example: >
 						*<Plug>(EasyTermSendText)*
 <Plug>(EasyTermSendText)	mode: normal(n), visual(x)
 
-	Sends current line(n) or visually selected text(x) to terminal buffer.
-	It is useful to test sections of a shell, python or vim script as you
-	write so that the terminal buffer acts as a (crude) REPL enviroment.
+        Sends current line(n) or visually selected text(x) to the primary
+        terminal buffer.  It is useful to test sections of a shell, python or
+        vim script as you write so that the terminal buffer acts as a (crude)
+        REPL enviroment.
 
 	If current buffer's 'filetype' is python or vim, the text is treated
-	so that `python` or `ex` gives in the expected behavior.  For example,
-	in a python script, >
+	so that python or ex gives in the expected behavior.  For example, in
+	a python script, >
 		if 'a' == 'b':
 		    print("a is b")
 		print(1 + 2)
-<
-	which would run without a problem, if all three lines were sent
+<	which would run without a problem, if all three lines were sent
 	literally to a terminal buffer it would say, >
 		>>> if 'a' == 'b':
 		...     print("a is b")
@@ -106,54 +108,169 @@ NOTE do not use `noremap`.  Example: >
 		    ^
 		SyntaxError: invalid syntax
 		>>> 
-<
-	Since `python` expects a new line character after and of an indented
-	block such as class, def, for, and if-else.  Likewise, `ex` gives an
-	error when empty line is entered or line-continuation exists.
+<	since python expects a new line character after an indented block such
+	as class, def, for, and if-else.  Likewise, `ex` gives an error when
+	empty line is entered or line-continuation exists.
 	|<Plug>(EasyTermSendText)| takes care of (most of) these cases.
 
          					*<Plug>(EasyTermPutLast)*
 <Plug>(EasyTermPutLast)		mode: normal(n)
 
-	Pastes last output of terminal buffer to current buffer before cursor
-	position.  The last output is obtained by first guessing prompt and
-	search the next previous occurrence of the guessed prompt then yanking
-	all lines in between.
+        Pastes last output of the primary terminal buffer to current buffer
+        before cursor position.  The last output is obtained by first guessing
+        the prompt and search the previous occurrence of the guessed prompt
+        then yanking all lines in between.
 
 	There are many edge cases so please don't expect it would always work.
 	For example, whenever PS2 exists, those lines with PS2 will be yanked
-	as well.  Use Terminal-Normal mode instead.  See |Terminal-mode|, and
-	|t_CTRL-W_N|
+	as well.  In such cases, one can use the Terminal-Normal mode instead.
+	See |Terminal-mode|, and |t_CTRL-W_N|.
 
          					*<Plug>(EasyTermYankLast)*
 <Plug>(EasyTermYankLast)	mode: terminal(t)
 
-	Yanks last output of terminal buffer to the unnamed register "".
-	Has the same problem as |<Plug>(EasyTermPutLast)|.
+        Yanks last output of the primary terminal buffer to the unnamed
+        register "".  Has the same problem as |<Plug>(EasyTermPutLast)|.
 
          					*<Plug>(EasyTermCdVim)*
 <Plug>(EasyTermCdVim)		mode: normal(n)
 
-	Change directory of vim and terminal to current buffer's directory if
-	terminal is running interactive shell that has `cd` command.
+        Change directory of vim and the primary terminal to current buffer's
+        directory if terminal is running an interactive shell that has `cd`
+        command.  It is useful when you first do commands like |:edit|, |:sp|
+        to open a new buffer in "some remote" directory then want to change
+        the terminal's working directory to follow that of vim. Uses the same
+        underlying function of |<Plug>(EasyTermCdTerm)|.
 
          					*<Plug>(EasyTermCdTerm)*
 <Plug>(EasyTermCdTerm)		mode: terminal(t)
 
-	Change directory of terminal, running interactive shell that has `cd`
-	command, to vim's cwd.
+        Change directory of the primary terminal, running an interactive
+        shell that has `cd` command, to vim's cwd.
+
+	Literally sends `cd {getcwd()}<CR>` to the terminal buffer.
+
+         					*<Plug>(EasyTermSet)*
+<Plug>(EasyTermSet)		mode: terminal(t)
+
+        Sets the current terminal buffer as the primary one. All the mappings 
+        needs to know which one is primary terminal if there are more than one
+        terminal buffers.
+        
 
 
 ==============================================================================
 3. Communication				*easy_term_communication*
 
+See :help |terminal-communication| for more information on how this works.
+Functionality of this plugin is essentially a thin, very much biased, wrapper
+for specific cases.
+
+						*easy_term_comm_vim2term*
+Vim to terminal~
+
+To send keys to a terminal buffer using |term_sendkeys()|, the terminal buffer
+number is required.  It is convenient to store the most recent, hence probably
+desired, terminal buffer number, since the terminal can be opened multiple
+times.  And it is referred to as the "primary" teriminal, which can be changed
+using |<Plug>(EasyTermSet)| mapping.
+
+Currently, there are three mappings for vim to terminal communication:
+|<Plug>(EasyTermSendText)|, |<Plug>(EasyTermCdVim)|, |<Plug>(EasyTermCdTerm)|.
+
+To use the primary terminal buffer number, use |easy_term#GetBufnr()|.
+Example: >
+	:echo bufname(easy_term#GetBufnr())
+	:call easy_term#GetBufnr()->term_send("text")
+<
+See :help |terminal-to-job| for more info.
+
+						*easy_term_comm_term2vim*
+Terminal to vim~
+
+The terminal can send JSON to Vim, using a special escape sequence.  This JSON
+can call vim functions only if the functions have a special prefix.  This
+plugin provides a few useful vim functions and bash and python scripts that
+can call those functions (if it makes sense to do so) conveniently.
+
+BASH
+
+To use this functionality, use |:Term| with >
+	bash --rcfile {where_plugin_is}/scripts/setup_bash.sh
+which is the default value of  |g:easy_term_alias|["bash"].
+
+The `setup_bash.sh` script sources .bashrc file and a completion file for
+`tovim` script then add `tovim` to the '$PATH' environment.
+
+Below is the help message of `tovim` (tab-completion is supported):  >
+  $ tovim help
+  tovim - send JSON to parent process vim.
+  
+  Usage: tovim <command> [arguments]
+  
+  Commands:
+    cd [path]   Change current working directory of vim and terminal to [path].
+    make        Invoke :make and open QuickFix window.  Note that it's not a
+                asynchronous process.
+    set         Set the current terminal buffer to be primary.  It is used for
+                terminal-to-job api (term_sendkeys()).
+    sp [file]
+    vs [file]   Open [file] with horizontal/vertical split after selecting the
+                most closest vim window.  If no [file] is given, open an empty
+                buffer.
+    help        Print this help message
+  
+  See ':help easy_term' in vim for specific implementations and key mappings.
+  For general information, see ':help terminal' in vim.
+<
+Usage example: >
+	$ tovim cd ~/.vim
+	$ tovim vs README.md
+<
+
+
+
+PYTHON
+
+To use this functionality, use |:Term| with >
+	python3 -i {where_plugin_is}/scripts/setup_python.py
+which is the default value of |g:easy_term_alias|["py3"].
+
+The `setup_python.py` script sources '$PYTHONSTARTUP' environment if it
+exists, and define a class ToVim which is instantiated as `tovim = ToVim()`
+
+Below is the help message of `tovim` object: >
+  >>> help(tovim)
+  Help on ToVim in module __main__ object:
+  
+  class ToVim(builtins.object)
+   |  ToVim() - send JSON to parent process vim.
+   |  
+   |  Methods defined here:
+   |  
+   |  set(self)
+   |      Set the current terminal buffer as primary.  It is used for
+   |      terminal-to-job api (term_sendkeys()).
+   |  
+   |  ----------------------------------------------------------------------
+   |  Data descriptors defined here:
+   |  
+   |  __dict__
+   |      dictionary for instance variables (if defined)
+   |  
+   |  __weakref__
+   |      list of weak references to the object (if defined)
+  (END)
+<
+
+See :help |terminal-api| for more info.
 
 ==============================================================================
 4. Settings						*easy_term_settings*
 
 						*easy_term_rows* *easy_term_cols*
 g:easy_term_rows		string (default: "15,18%")
-g:easy_term_cols		string (default: "150,40%")
+g:easy_term_cols		string (default: "100,40%")
 
 	A comma separated list of number of lines/columns, percentage of
 	number of lines/columns respect to 'line'/'column'.  If both number
@@ -194,8 +311,9 @@ g:easy_term_alias		Dictionary (default: see below)
 		or
 		:let g:easy_term_alias = { 'zsh' : 'zsh -i' }
 <
+
 ==============================================================================
-5. License	
+5. License
 ==============================================================================
 6. Bugs	
 ==============================================================================
