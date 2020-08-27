@@ -11,15 +11,16 @@ if os.environ.get('PYTHONSTARTUP') is not None:
         exec(compile(f.read(), pythonrc, 'exec'), globals())
 
 class ToVim():
-    """docstring for ToVim"""
-    def help(self):
-        print(inspect.cleandoc(self.__doc__))
-
+    """ToVim() - send JSON to parent process vim."""
     def set(self):
+        """Set the current terminal buffer as primary.  It is used for
+        terminal-to-job api (term_sendkeys()).
+        """
         print("Setting this terminal buffer as primary.")
         self._send("call", "set_term_bufnr")
 
     def _send(self, cmd, name, args = []):
+        """Format and send JSON for terminal-api in vim"""
         if cmd == "call":
             fullname = 'easy_term#Tapi_'+name
             arguments = '[' + ','.join(['"'+arg+'"' for arg in args]) + ']'

@@ -16,17 +16,18 @@ Usage: ${script} <command> [arguments]
 
 Commands:
   cd [path]   Change current working directory of vim and terminal to [path].
-  help        Print this help message
-  make        Invoke make and open QuickFix window.  Note that it's
-              synchronous process.
-  set         Set 'g:term_bufnr' to the current terminal buffer number.
-              'g:term_bufnr' is used for terminal-to-job api (term_sendkeys()).
+  make        Invoke :make and open QuickFix window.  Note that it's not a
+              asynchronous process.
+  set         Set the current terminal buffer to be primary.  It is used for
+              terminal-to-job api (term_sendkeys()).
   sp [file]
-  vs [file]   Open [file] with horizontal/vertical split.  If no [file] is
-              given, opens an empty buffer.
+  vs [file]   Open [file] with horizontal/vertical split after selecting the
+              most closest vim window.  If no [file] is given, open an empty
+              buffer.
+  help        Print this help message
 
-See 'vimrc' for specific implementations and key mappings.  For general
-information, see ':help terminal' in vim.
+See ':help easy_term' in vim for specific implementations and key mappings.
+For general information, see ':help terminal' in vim.
 HELP
 }
 
