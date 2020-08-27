@@ -108,6 +108,14 @@ function! easy_term#GetBufnr() abort
   return s:term_bufnr
 endfunction
 
+function! easy_term#SetBufnr(bufnr) abort
+  if index(term_list(), a:bufnr) == -1
+    return -1
+  endif
+  let s:term_bufnr = a:bufnr
+  echomsg "This terminal(" . s:term_bufnr . ") is now set to primary."
+endfunction
+
 function! easy_term#Complete(A,L,P) abort
   let l:k = keys(g:easy_term_alias)
   call remove(l:k, get(l:k, ""))
@@ -117,7 +125,7 @@ endfunction
 " terminal-api
 function! easy_term#Tapi_set_term_bufnr(bufnr, arglist) abort
   let s:term_bufnr = a:bufnr
-  echomsg "This terminal(" . s:term_bufnr . ") is now set to s:term_bufnr."
+  echomsg "This terminal(" . s:term_bufnr . ") is now set to primary."
 endfunction
 
 function! easy_term#Tapi_change_directory(bufnr, arglist) abort
