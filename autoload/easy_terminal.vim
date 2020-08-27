@@ -157,16 +157,14 @@ function! s:ProcessVimscript(code) abort
 endfunction
 
 function! s:ProcessPython(code) abort
-  " elseif, else not working!
   let l:text = ""
   let l:previous_indent = 0
   for l:line in split(a:code, '\m\n\+')
     let l:current_indent = match(l:line, '\m\w')
-    if !l:current_indent && l:previous_indent
-      let l:text .= "\n".l:line."\n"
-    else
-      let l:text .= l:line."\n"
+    if !l:current_indent && l:previous_indent && split(l:line)[0] !~ 'el\(se\|if\)'
+      let l:text .= "\n"
     endif
+    let l:text .= l:line."\n"
     let l:previous_indent = l:current_indent
   endfor
   return l:previous_indent ? l:text."\n" : l:text
