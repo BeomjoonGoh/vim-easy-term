@@ -19,8 +19,8 @@ function! s:SetAlias() abort
 endfunction
 
 " variables
-let g:easy_term_rows   = get(g:, 'easy_term_rows', '15,18%')
-let g:easy_term_cols   = get(g:, 'easy_term_cols','100,40%')
+let g:easy_term_rows   = get(g:, 'easy_term_rows', '50%')
+let g:easy_term_cols   = get(g:, 'easy_term_cols', '50%')
 let g:easy_term_winfix = get(g:, 'easy_term_winfix', 1)
 let g:easy_term_alias  = s:SetAlias()
 
