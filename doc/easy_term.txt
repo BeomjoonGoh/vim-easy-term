@@ -269,19 +269,20 @@ See :help |terminal-api| for more info.
 4. Settings						*easy_term_settings*
 
 						*easy_term_rows* *easy_term_cols*
-g:easy_term_rows		string (default: "15,18%")
-g:easy_term_cols		string (default: "100,40%")
+g:easy_term_rows		string (default: "50%")
+g:easy_term_cols		string (default: "50%")
 
 	A comma separated list of number of lines/columns, percentage of
-	number of lines/columns respect to 'line'/'column'.  If both number
+	number of lines/columns respect to 'lines'/'columns'.  If both number
 	and percentage is given, minimum of the two is used.  This is used
 	when |:Term| command has <mods> that opens a window with full width or
 	height of the Vim window.  (|:topleft|, |:botright|).  Example: >
-		:let g:easy_term_cols = "150"
+		:let g:easy_term_cols = "150,40%"
 		:vertical botright Term bash -l
 <
-	Opens a vertically split, full-height and 150 column wide vim terminal
-	emulator window running bash with a login shell option.
+	If vim is on 300 columns wide screen, above commands open a vertically
+	split, full-height and 120 column wide vim terminal emulator window
+	running bash with a login shell option.
 
 							*easy_term_winfix*
 g:easy_term_winfix		boolean (default: 1)
