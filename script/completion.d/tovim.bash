@@ -10,7 +10,7 @@ function _tovim_complete() {
   curr=${COMP_WORDS[COMP_CWORD]}
   prev=${COMP_WORDS[COMP_CWORD - 1]}
   if [ "${COMP_CWORD}" -eq 1 ]; then
-    COMPREPLY=( $(compgen -W "cd help make set vs sp" -- "$curr") )
+    COMPREPLY=( $(compgen -W "cd help make set sp tab vs" -- "$curr") )
   elif [ "${COMP_CWORD}" -eq 2 ]; then
     local IFS=$'\n'
     case "${prev}" in
@@ -18,7 +18,7 @@ function _tovim_complete() {
         _cd
         COMPREPLY=( $(compgen -W '${COMPREPLY[@]}' -- "$curr") )
         ;;
-      vs|sp)
+      vs|sp|tab)
         _filedir_xspec
         COMPREPLY=( $(compgen -W '${COMPREPLY[@]}' -- "$curr") )
         ;;

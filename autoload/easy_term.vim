@@ -139,15 +139,18 @@ function! easy_term#Tapi_change_directory(bufnr, arglist) abort
   endif
 endfunction
 
-function! easy_term#Tapi_split(bufnr, arglist) abort
-  if a:arglist[0] != 'v' && a:arglist[0] != 's'
-    return
+function! easy_term#Tapi_open(bufnr, arglist) abort
+  if a:arglist[0] == 's'
+    let l:mode = ''
+  elseif a:arglist[0] == 'v'
+    let l:mode = 'vertical'
+  elseif a:arglist[0] == 't'
+    let l:mode = 'tab'
   endif
-  let l:mode = (a:arglist[0] == 's') ? '' : a:arglist[0]
   let l:file = a:arglist[1]
-  let l:cmd = (l:file == "new") ? '' : "split "
+  let l:cmd = (l:file == 'new') ? '' : 'split'
   wincmd W
-  execute l:mode.l:cmd.l:file
+  execute l:mode l:cmd l:file
 endfunction
 
 function! easy_term#Tapi_make(bufnr, arglist) abort

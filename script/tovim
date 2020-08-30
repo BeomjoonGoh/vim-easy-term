@@ -21,9 +21,10 @@ Commands:
   set         Set the current terminal buffer to be primary.  It is used for
               terminal-to-job api (term_sendkeys()).
   sp [file]
-  vs [file]   Open [file] with horizontal/vertical split after selecting the
-              most closest vim window.  If no [file] is given, open an empty
-              buffer.
+  vs [file]
+  tab [file]  Open [file] with horizontal/vertical split after selecting the
+              most closest vim window or in a new tab.  If no [file] is given,
+              open an empty buffer.
   help        Print this help message
 
 See ':help easy_term' in vim for specific implementations and key mappings.
@@ -39,7 +40,7 @@ function change_directory() {
   send call "${FUNCNAME[0]}" "${path}" ${do_cd}
 }
 
-function split() {
+function open() {
   if [ $# -eq 1 ]; then
     send call "${FUNCNAME[0]}" "$1" new
   else
@@ -114,8 +115,9 @@ function tovim() {
     "help") usage ;;
     "set") set_term_bufnr ;;
     "cd") change_directory "${@:2}" ;;
-    "vs") split 'v' "${@:2}" ;;
-    "sp") split 's' "${@:2}" ;;
+    "vs") open 'v' "${@:2}" ;;
+    "sp") open 's' "${@:2}" ;;
+    "tab") open 't' "${@:2}" ;;
     "make") make "${@:2}" ;;
     *) 
       >&2 echo "${script}: Not a command."
