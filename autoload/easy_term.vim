@@ -119,7 +119,7 @@ endfunction
 function! easy_term#Complete(A,L,P) abort
   let l:k = keys(g:easy_term_alias)
   call remove(l:k, get(l:k, ""))
-  return join(l:k,"\n")
+  return join(sort(l:k),"\n")
 endfunction
 
 " terminal-api
@@ -203,7 +203,7 @@ function! s:DefineWinfixAugroup(do)
       autocmd!
       autocmd TerminalOpen *
           \ if &buftype == 'terminal' |
-          \   setlocal winfixheight winfixwidth | 
+          \   setlocal winfixheight winfixwidth |
           \   wincmd = |
           \ endif
     augroup END
