@@ -1,31 +1,47 @@
-*easy_term.txt*	For Vim version 8.2.	Last change: 2020 Aug 14
+*easy_term.txt*                For Vim version 8.2.    Last change: 2020 Aug 31
 
-		   Easy Term		by Beomjoon Goh
+                                 -----------
+                                  Easy Term
+                                 -----------
 
+Author: Beomjoon Goh
 
-								*easy_term*
-1. Introduction					|easy_term_intro|
-2. Usage					|easy_term_usage|
-	Commands
-	Mappings				|easy_term_mappings|
-3. Communication				|easy_term_communication|
-	Vim to terminal
-	Terminal to vim
-4. Settings					|easy_term_settings|
-5. License
-6. Bugs
-7. Credits
-8. Changelog
+								    *easy_term*
+1. Introduction				|easy_term_intro|
+2. Usage				|easy_term_usage|
+	Commands			|easy_term_commands|
+	Mappings			|easy_term_mappings|
+3. Communication			|easy_term_communication|
+	Vim to terminal			|easy_term_comm_vim2term|
+	Terminal to vim			|easy_term_comm_term2vim|
+4. Settings				|easy_term_settings|
+5. License				|easy_term_license|
+6. Bugs					|easy_term_bugs|
+7. Contributing				|easy_term_contributing|
+8. Changelog				|easy_term_changelog|
+9. Credits				|easy_term_credits|
 
 ==============================================================================
-1. Introduction						*easy_term_intro*
+1. Introduction						      *easy_term_intro*
 
+The Easy Term makes using vim's |:terminal| feature easier to use.
+
+
+The following features and functionality are provided:
+    * Make aliases for opening the vim terminal emulator.
+    * `tovim` utility for Python and Bash, if you choose to use, can do a few
+      useful things like opening a new buffer from terminal or change cwd of
+      vim to that of terminal.
+    * Send texts from an open buffer to the terminal with a mapping.
+    * Past/Yank the last output of the terminal to an open buffer with a
+      mapping.
 
 ==============================================================================
-2. Usage						*easy_term_usage*
+2. Usage						      *easy_term_usage*
 
+							   *easy_term_commands*
 Commands~
-								*:Term*
+									*:Term*
 :Term[!] [{cmd}]
 
 	Split Opens a vim terminal emulator window running {cmd}.  The {cmd}
@@ -52,45 +68,45 @@ Commands~
 
 	"term_name" is set as `[Terminal] word` using the first word of {cmd}.
 
-        Internally stores the most recent terminal buffer number for public
-        functions and mappings.  And it is referred to as "primary" terminal.
-        To change the primary terminal to a different one, use
-        |<Plug>(EasyTermSet)| mapping or |easy_term#Tapi_set_terminal_bufnr()| via
-        terminal-vim communication.
+	Internally stores the most recent terminal buffer number for public
+	functions and mappings.  And it is referred to as "primary" terminal.
+	To change the primary terminal to a different one, use
+	|<Plug>(EasyTermSet)| mapping or |easy_term#Tapi_set_terminal_bufnr()|
+	via terminal-vim communication.
 
 	Tab completion is supported using the keys of |easy_term_alias|.  If
 	you want to define additional commands with completion, for example
 	`Tterm` that opens a terminal window in a new tab, put this in your
-	vimrc file: >
+	vimrc: >
 		:command! -nargs=? -complete=custom,easy_term#Complete
 				\ Tterm tab Term <args>
 <
+							   *easy_term_mappings*
 Mappings~
-							*easy_term_mappings*
 
 This plugin defines the following <Plug> mappings:
 
-{mod}  {rhs}                     Description~
---------------------------------------------------------------------------
-n,x    |<Plug>(EasyTermSendText)|  Send a line or selected text to terminal
-n      |<Plug>(EasyTermPutLast)|   Paste last output of terminal to buffer
-t      |<Plug>(EasyTermYankLast)|  Yank last output of terminal
-n      |<Plug>(EasyTermCdVim)|     Change cwd of vim & shell to buffer's dir
-t      |<Plug>(EasyTermCdTerm)|    Change cwd of shell to vim's cwd
-t      |<Plug>(EasyTermCdSet)|     Make the current terminal primary
+{mod} {rhs}                    Description~
+-------------------------------------------------------------------------
+ n,x  |<Plug>(EasyTermSendText)| Send a line or selected text to terminal
+ n    |<Plug>(EasyTermPutLast)|  Paste last output of terminal to buffer
+ t    |<Plug>(EasyTermYankLast)| Yank last output of terminal
+ n    |<Plug>(EasyTermCdVim)|    Change cwd of vim & shell to buffer's dir
+ t    |<Plug>(EasyTermCdTerm)|   Change cwd of shell to vim's cwd
+ t    |<Plug>(EasyTermCdSet)|    Make the current terminal primary
 
 To use any of the <Plug> mapping, add the following in your vimrc:
 	{mod}map {lhs} {rhs}
-NOTE do not use `noremap`.  Example: >
+For Example, >
 	:nmap <Leader>p <Plug>(EasyTermPutLast)
 <
-						*<Plug>(EasyTermSendText)*
+						     *<Plug>(EasyTermSendText)*
 <Plug>(EasyTermSendText)	mode: normal(n), visual(x)
 
-        Sends current line(n) or visually selected text(x) to the primary
-        terminal buffer.  It is useful to test sections of a shell, python or
-        vim script as you write so that the terminal buffer acts as a (crude)
-        REPL enviroment.
+	Sends current line(n) or visually selected texts(x) to the primary
+	terminal buffer.  It is useful to test sections of a shell, python or
+	vim script as you write so that the terminal buffer acts as a (crude)
+	REPL environment.
 
 	If current buffer's 'filetype' is python or vim, the text is treated
 	so that python or ex gives in the expected behavior.  For example, in
@@ -113,60 +129,60 @@ NOTE do not use `noremap`.  Example: >
 	empty line is entered or line-continuation exists.
 	|<Plug>(EasyTermSendText)| takes care of (most of) these cases.
 
-         					*<Plug>(EasyTermPutLast)*
+	 					      *<Plug>(EasyTermPutLast)*
 <Plug>(EasyTermPutLast)		mode: normal(n)
 
-        Pastes last output of the primary terminal buffer to current buffer
-        before cursor position.  The last output is obtained by first guessing
-        the prompt and search the previous occurrence of the guessed prompt
-        then yanking all lines in between.
+	Pastes last output of the primary terminal buffer to current buffer
+	before cursor position.  The last output is obtained by first guessing
+	the prompt and search the previous occurrence of the guessed prompt
+	then yanking all lines in between.
 
 	There are many edge cases so please don't expect it would always work.
 	For example, whenever PS2 exists, those lines with PS2 will be yanked
 	as well.  In such cases, one can use the Terminal-Normal mode instead.
 	See |Terminal-mode|, and |t_CTRL-W_N|.
 
-         					*<Plug>(EasyTermYankLast)*
+	 					     *<Plug>(EasyTermYankLast)*
 <Plug>(EasyTermYankLast)	mode: terminal(t)
 
-        Yanks last output of the primary terminal buffer to the unnamed
-        register "".  Has the same problem as |<Plug>(EasyTermPutLast)|.
+	Yanks last output of the primary terminal buffer to the unnamed
+	register "".  Has the same problem as |<Plug>(EasyTermPutLast)|.
 
-         					*<Plug>(EasyTermCdVim)*
+							*<Plug>(EasyTermCdVim)*
 <Plug>(EasyTermCdVim)		mode: normal(n)
 
-        Change directory of vim and the primary terminal to current buffer's
-        directory if terminal is running an interactive shell that has `cd`
-        command.  It is useful when you first do commands like |:edit|, |:sp|
-        to open a new buffer in "some remote" directory then want to change
-        the terminal's working directory to follow that of vim. Uses the same
-        underlying function of |<Plug>(EasyTermCdTerm)|.
+	Change directory of vim and the primary terminal to current buffer's
+	directory if terminal is running an interactive shell that has `cd`
+	command.  It is useful when you first do commands like |:edit|, |:sp|
+	to open a new buffer in "some remote" directory then want to change
+	the terminal's working directory to follow that of vim. Uses the same
+	underlying function of |<Plug>(EasyTermCdTerm)|.
 
-         					*<Plug>(EasyTermCdTerm)*
+						       *<Plug>(EasyTermCdTerm)*
 <Plug>(EasyTermCdTerm)		mode: terminal(t)
 
-        Change directory of the primary terminal, running an interactive
-        shell that has `cd` command, to vim's cwd.
+	Change directory of the primary terminal, running an interactive
+	shell that has `cd` command, to vim's cwd.
 
 	Literally sends `cd {getcwd()}<CR>` to the terminal buffer.
 
-         					*<Plug>(EasyTermSet)*
+							  *<Plug>(EasyTermSet)*
 <Plug>(EasyTermSet)		mode: terminal(t)
 
-        Sets the current terminal buffer as the primary one. All the mappings 
-        needs to know which one is primary terminal if there are more than one
-        terminal buffers.
-        
+	Sets the current terminal buffer as the primary one. All the mappings 
+	needs to know which one is primary terminal if there are more than one
+	terminal buffers.
+	
 
 
 ==============================================================================
-3. Communication				*easy_term_communication*
+3. Communication				      *easy_term_communication*
 
 See :help |terminal-communication| for more information on how this works.
 Functionality of this plugin is essentially a thin, very much biased, wrapper
 for specific cases.
 
-						*easy_term_comm_vim2term*
+						      *easy_term_comm_vim2term*
 Vim to terminal~
 
 To send keys to a terminal buffer using |term_sendkeys()|, the terminal buffer
@@ -185,7 +201,7 @@ Example: >
 <
 See :help |terminal-to-job| for more info.
 
-						*easy_term_comm_term2vim*
+						      *easy_term_comm_term2vim*
 Terminal to vim~
 
 The terminal can send JSON to Vim, using a special escape sequence.  This JSON
@@ -197,7 +213,7 @@ BASH
 
 To use this functionality, use |:Term| with >
 	bash --rcfile {where_plugin_is}/scripts/setup_bash.sh
-which is the default value of  |g:easy_term_alias|["bash"].
+which is the default value of  |easy_term_alias|["bash"].
 
 The `setup_bash.sh` script sources .bashrc file and a completion file for
 `tovim` script then add `tovim` to the '$PATH' environment.
@@ -234,7 +250,7 @@ PYTHON
 
 To use this functionality, use |:Term| with >
 	python3 -i {where_plugin_is}/scripts/setup_python.py
-which is the default value of |g:easy_term_alias|["py3"].
+which is the default value of |easy_term_alias|["py3"].
 
 The `setup_python.py` script sources '$PYTHONSTARTUP' environment if it
 exists, and define a class ToVim which is instantiated as `tovim = ToVim()`
@@ -266,7 +282,7 @@ Below is the help message of `tovim` object: >
 See :help |terminal-api| for more info.
 
 ==============================================================================
-4. Settings						*easy_term_settings*
+4. Settings						   *easy_term_settings*
 
 						*easy_term_rows* *easy_term_cols*
 g:easy_term_rows		string (default: "50%")
@@ -284,14 +300,14 @@ g:easy_term_cols		string (default: "50%")
 	split, full-height and 120 column wide vim terminal emulator window
 	running bash with a login shell option.
 
-							*easy_term_winfix*
+							     *easy_term_winfix*
 g:easy_term_winfix		boolean (default: 1)
 
 	When on, if |:Term| command has <mods> that uses |easy_term_rows| or
 	|easy_term_cols|, locally sets 'winfixheight' and 'winfixwidth' and
 	make already open windows (almost) equally high and wide.
 
-							*easy_term_alias*
+							      *easy_term_alias*
 g:easy_term_alias		Dictionary (default: see below)
 
 	Dictionary of {alias} and {cmd} pairs for |:Term| command.  The
@@ -314,12 +330,39 @@ g:easy_term_alias		Dictionary (default: see below)
 <
 
 ==============================================================================
-5. License
+5. License						    *easy_term_license*
+
+Under the MIT License. (c) Copyright 2020 Beomjoon Goh.
+
 ==============================================================================
-6. Bugs	
+6. Bugs							       *easy_term_bugs*
+
+Known~
+  * easy_term#YankLastOutput(): When PS2 exists it yanks that part as well.
+
+Unknown~
+
+Please report any bugs you may find or feature request on the GitHub issue
+tracker:
+
+	https://github.com/BeomjoonGoh/vim-easy-term/issues
+
 ==============================================================================
-7. Credits	
+7. Contributing					       *easy_term_contributing*
+
+Contributions and pull requests are welcome.
+
+	https://github.com/BeomjoonGoh/vim-easy-term
+
 ==============================================================================
-8. Changelog	
+8. Changelog						  *easy_term_changelog*
+
+v0.0.1 - 2020-08-31
+	* Initial release
+
+==============================================================================
+9. Credits						    *easy_term_credits*
+
+Easy Term is originally written by Beomjoon Goh (GitHub: BeomjoonGoh)
 
  vim:tw=78:ts=8:noet:ft=help:norl:sw=8:sts=8:
