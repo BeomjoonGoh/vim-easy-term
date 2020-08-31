@@ -24,17 +24,53 @@ Author: Beomjoon Goh
 ==============================================================================
 1. Introduction						      *easy_term_intro*
 
-The Easy Term makes using vim's |:terminal| feature easier to use.
+The Easy Term makes using vim's |:terminal| feature easier to use.  The
+following features and functionality are provided:
 
+* Make aliases for opening the vim terminal emulator.  For example, when
+  opening a bash shell, you would want it to be a login shell so that bashrc
+  is sourced.  And if you also want the terminal buffer to go away after
+  exiting bash, we have to type
+	`:terminal ++close bash --login`
+  and it quickly becomes unwieldy.  Using |:Term|, alias can be set (such as
+  an empty string, see |easy_term_alias|), 
+	`:let g:easy_term_alias[''] = 'bash --login'`
+  then below will do that for you.
+	`:Term`
+  Furthermore tab-completion is supported using the aliases, >
+	:Term <Tab>
+	bash	ex	py3	zsh	...
+<  Of course any lengthy command without defining alias can be directly passed
+  to |:Term| as well:
+	`:Term whatever --with --option`
 
-The following features and functionality are provided:
-    * Make aliases for opening the vim terminal emulator.
-    * `tovim` utility for Python and Bash, if you choose to use, can do a few
-      useful things like opening a new buffer from terminal or change cwd of
-      vim to that of terminal.
-    * Send texts from an open buffer to the terminal with a mapping.
-    * Past/Yank the last output of the terminal to an open buffer with a
-      mapping.
+* |:Term| sets a few options for |term_start()|.  Options such as
+  term_finish, term_cols, are set. See below.
+
+* `tovim` utility for Bash and Python, if you choose to use, can do a few
+  useful things like opening a new buffer from terminal or change cwd of vim
+  to that of terminal (|easy_term_comm_term2vim|).  For example, if you open a
+  buffer inside the terminal using
+	`$ vim file.txt`
+  that instance of vim is inside of terminal and not so useful.  In such case,
+	`$ tovim vs file.txt`
+  will vertically split open 'file.txt' in the parent vim.
+
+* Send texts from an open buffer to the terminal with a mapping.  When working
+  with a scripting language, often it is useful to test sections of the
+  script.  For example if you open an interactive Python in a terminal
+	`:Term py3`
+  and in a python file, using |<Plug>(EasyTermSendText)| mapping on the lines >
+	a = 3
+	print(1 + a)
+<  will send the lines to the terminal.  The terminal would look something
+  like >
+	>>> a = 3
+	>>> print(1 + a)
+	4
+<
+* Paste/Yank the last output of the terminal to an open buffer with a
+  mapping using |<Plug>(EasyTermPutLast)|, |<Plug>(EasyTermYankLast)|.
 
 ==============================================================================
 2. Usage						      *easy_term_usage*
@@ -44,7 +80,7 @@ Commands~
 									*:Term*
 :Term[!] [{cmd}]
 
-	Split Opens a vim terminal emulator window running {cmd}.  The {cmd}
+	Split opens a vim terminal emulator window running {cmd}.  The {cmd}
 	is tested whether it is an alias or a command.  If given argument is
 	found in the dictionary key list, the value of |easy_term_alias| is
 	passed to |term_start()| function.  Otherwise, the whole argument is
@@ -53,7 +89,7 @@ Commands~
 	When [!] is added, opens the terminal window using the current window
 	if it is possible instead of splitting.
 
-	Any <mods> for split window can be used such as |:vertical|.  If
+	Any <mods> for spliting window can be used such as |:vertical|.  If
 	<mods> that forcibly takes full width or height is given,
 	|easy_term_rows| or |easy_term_cols| is used to calculate
 	corresponding minimum height or width.
@@ -62,12 +98,7 @@ Commands~
 		:Term
 		:Term bash
 		:vertical Term python3 -i myprogram.py
-<	
-	After the terminal job is finished, the window is automatically
-	closed (|term++close|).
-
-	"term_name" is set as `[Terminal] word` using the first word of {cmd}.
-
+<
 	Internally stores the most recent terminal buffer number for public
 	functions and mappings.  And it is referred to as "primary" terminal.
 	To change the primary terminal to a different one, use
@@ -81,6 +112,15 @@ Commands~
 		:command! -nargs=? -complete=custom,easy_term#Complete
 				\ Tterm tab Term <args>
 <
+	Options set by |:Term| command for |term_start()|: >
+		'term_finish' : 'close'          " Close when job is finished.
+		'term_cols' : easy_term_cols     " If relevant <mods> is used.
+		'term_rows' : easy_term_rows     " If relevant <mods> is used.
+		'term_name' : '[Term] {prog}'    " First word of {cmd}.
+		'curwin'    : 1                  " If [!] is used.
+		'term_api'  : 'easy_term_#Tapi_'
+<
+
 							   *easy_term_mappings*
 Mappings~
 
@@ -172,7 +212,6 @@ For Example, >
 	Sets the current terminal buffer as the primary one. All the mappings 
 	needs to know which one is primary terminal if there are more than one
 	terminal buffers.
-	
 
 
 ==============================================================================
@@ -213,7 +252,7 @@ BASH
 
 To use this functionality, use |:Term| with >
 	bash --rcfile {where_plugin_is}/scripts/setup_bash.sh
-which is the default value of  |easy_term_alias|["bash"].
+which is the default value of |easy_term_alias|["bash"].
 
 The `setup_bash.sh` script sources .bashrc file and a completion file for
 `tovim` script then add `tovim` to the '$PATH' environment.
@@ -261,24 +300,23 @@ Below is the help message of `tovim` object: >
   
   class ToVim(builtins.object)
    |  ToVim() - send JSON to parent process vim.
-   |  
+   |
    |  Methods defined here:
-   |  
+   |
    |  set(self)
    |      Set the current terminal buffer as primary.  It is used for
    |      terminal-to-job api (term_sendkeys()).
-   |  
+   |
    |  ----------------------------------------------------------------------
    |  Data descriptors defined here:
-   |  
+   |
    |  __dict__
    |      dictionary for instance variables (if defined)
-   |  
+   |
    |  __weakref__
    |      list of weak references to the object (if defined)
   (END)
 <
-
 See :help |terminal-api| for more info.
 
 ==============================================================================

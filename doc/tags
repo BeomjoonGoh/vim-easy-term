@@ -8,11 +8,17 @@
 easy_term	easy_term.txt	/*easy_term*
 easy_term.txt	easy_term.txt	/*easy_term.txt*
 easy_term_alias	easy_term.txt	/*easy_term_alias*
+easy_term_bugs	easy_term.txt	/*easy_term_bugs*
+easy_term_changelog	easy_term.txt	/*easy_term_changelog*
 easy_term_cols	easy_term.txt	/*easy_term_cols*
 easy_term_comm_term2vim	easy_term.txt	/*easy_term_comm_term2vim*
 easy_term_comm_vim2term	easy_term.txt	/*easy_term_comm_vim2term*
+easy_term_commands	easy_term.txt	/*easy_term_commands*
 easy_term_communication	easy_term.txt	/*easy_term_communication*
+easy_term_contributing	easy_term.txt	/*easy_term_contributing*
+easy_term_credits	easy_term.txt	/*easy_term_credits*
 easy_term_intro	easy_term.txt	/*easy_term_intro*
+easy_term_license	easy_term.txt	/*easy_term_license*
 easy_term_mappings	easy_term.txt	/*easy_term_mappings*
 easy_term_rows	easy_term.txt	/*easy_term_rows*
 easy_term_settings	easy_term.txt	/*easy_term_settings*
