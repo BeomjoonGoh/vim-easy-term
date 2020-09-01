@@ -3,12 +3,21 @@
 The Easy Term makes using vim's `:terminal` feature easier to use.
 
 
+## Contents
+
+- [Installation](#installation)
+- [Features](#features)
+- [Commands and Mappings](#commands-and-mappings)
+- [Communication between Vim and Terminal](#Communication-between-vim-and-terminal)
+- [Settings](#settings)
+
+
 ## Installation
 
 Use your favorite plugin manager.  For example using
 [vim-plug](https://github.com/junegunn/vim-plug),
- * Add `Plug 'BeomjoonGoh/vim-easy-term'` in your vimrc, and
- * Run `:PlugInstall`.
+* Add `Plug 'BeomjoonGoh/vim-easy-term'` in your vimrc, and
+* Run `:PlugInstall`.
 
 
 ## Features
@@ -116,7 +125,7 @@ To use any of the <Plug> mapping, add the following in your vimrc: `{mod}map
 See `:help easy_term_usage` for more information.
 
 
-## Communication Between Vim and Terminal
+## Communication between Vim and Terminal
 
 ### Vim to terminal
 
