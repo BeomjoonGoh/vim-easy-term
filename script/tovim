@@ -16,8 +16,7 @@ Usage: ${script} <command> [arguments]
 
 Commands:
   cd [path]   Change current working directory of vim and terminal to [path].
-  make        Invoke :make and open QuickFix window.  Note that it's not a
-              asynchronous process.
+  make        Invoke make and open QuickFix window.
   set         Set the current terminal buffer to be primary.  It is used for
               terminal-to-job api (term_sendkeys()).
   sp [file]
@@ -60,11 +59,17 @@ function make() {
   if [ ${makeable} -eq 0 ]; then
     >&2 echo "no makefile found."
     return
-
   fi
-  change_directory
-  echo "make" "$@"
-  send call "${FUNCNAME[0]}" "$@"
+
+  error="${PWD}/errors.err"
+  command make "$@" 2> "${error}" || :
+  if [ -s "${error}" ]; then
+    cat "${error}"
+    change_directory
+    send call "${FUNCNAME[0]}" "${error}"
+  else
+    rm -f "${error}"
+  fi
 }
 
 function set_term_bufnr() {

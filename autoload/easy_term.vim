@@ -154,8 +154,9 @@ function! easy_term#Tapi_open(bufnr, arglist) abort
 endfunction
 
 function! easy_term#Tapi_make(bufnr, arglist) abort
-  execute 'make' join(a:arglist, " ")
+  execute 'cgetfile' a:arglist[0]
   botright cwindow
+  call delete(a:arglist[0])
 endfunction
 
 " local function
