@@ -50,7 +50,7 @@ function! easy_term#CdTerm() abort
 endfunction
 
 function! easy_term#CdVim() abort
-  cd %:p:h
+  tcd %:p:h
   call easy_term#CdTerm()
 endfunction
 
@@ -98,7 +98,7 @@ function! easy_term#PutLastOutput() abort
   execute bufwinnr(s:term_bufnr).'wincmd w'
   call easy_term#YankLastOutput()
   wincmd p
-  normal! P
+  normal! p
 endfunction
 
 function! easy_term#GetBufnr() abort
@@ -132,7 +132,7 @@ function! easy_term#Tapi_change_directory(bufnr, arglist) abort
   let l:cwd = join(a:arglist[:-2], " ")
   let l:do_cd = a:arglist[-1]
   if getcwd() != l:cwd
-    execute 'cd' l:cwd
+    execute 'tcd' l:cwd
   endif
   if l:do_cd
     call easy_term#CdTerm()
