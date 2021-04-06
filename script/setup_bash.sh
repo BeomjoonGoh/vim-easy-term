@@ -7,7 +7,7 @@
 [ -f $HOME/.bashrc ] && source $HOME/.bashrc
 [ -f $HOME/.bash_profile ] && source $HOME/.bash_profile
 
-dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 export PATH=$dir:$PATH
 for comp in "${dir}/completion.d/"*; do
   source "${comp}"
