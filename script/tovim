@@ -2,7 +2,7 @@
 # tovim
 #
 # Maintainer:   Beomjoon Goh
-# Last Change:  14 Jul 2020 19:52:34 +0900
+# Last Change:  28 Apr 2021 17:14:48 +0900
 
 set -o nounset -o pipefail -o errexit
 
@@ -32,7 +32,7 @@ HELP
 }
 
 function change_directory() {
-  path="$(realpath "${1:-$PWD}")"
+  path="$(readlink -f "${1:-$PWD}")"
   do_cd=1
   [ "${path}" = "$PWD" ] && do_cd=0
   echo "Set pwd of vim to: ${path}"
@@ -43,7 +43,7 @@ function open() {
   if [ $# -eq 1 ]; then
     send call "${FUNCNAME[0]}" "$1" new
   else
-    send call "${FUNCNAME[0]}" "$1" "$(realpath "$2")"
+    send call "${FUNCNAME[0]}" "$1" "$(readlink -f "$2")"
   fi
 }
 
@@ -95,7 +95,7 @@ function send() {
       args+="]"
       ;;
     drop)
-      name="$(realpath "${name}")"
+      name="$(readlink -f "${name}")"
       args="{${arguments[*]}}"
       ;;
     *)
