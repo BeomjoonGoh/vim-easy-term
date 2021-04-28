@@ -2,7 +2,11 @@
 # tovim.bash
 #
 # Maintainer:   Beomjoon Goh
-# Last Change:  21 Feb 2020 15:46:20 +0900
+# Last Change:  28 Apr 2021 17:14:31 +0900
+
+function _tovim_exist_function() {
+  declare -F "$1" > /dev/null
+}
 
 function _tovim_complete() {
   local curr prev
@@ -12,25 +16,28 @@ function _tovim_complete() {
   if [ "${COMP_CWORD}" -eq 1 ]; then
     COMPREPLY=( $(compgen -W "cd help make set sp tab vs" -- "$curr") )
   elif [ "${COMP_CWORD}" -eq 2 ]; then
-    local IFS=$'\n'
-    case "${prev}" in
-      cd)
-        _cd
-        COMPREPLY=( $(compgen -W '${COMPREPLY[@]}' -- "$curr") )
-        ;;
-      vs|sp|tab)
-        _filedir_xspec
-        COMPREPLY=( $(compgen -W '${COMPREPLY[@]}' -- "$curr") )
-        ;;
-      make)
-        _make
-        COMPREPLY=( $(compgen -W '${COMPREPLY[@]}' -- "$curr") )
-        ;;
-      *)
-        ;;
-    esac
+    if _tovim_exist_function _cd && _tovim_exist_function _filedir_xspec && _tovim_exist_function _make; then
+      local IFS=$'\n'
+      case "${prev}" in
+        cd)
+          _cd
+          COMPREPLY=( $(compgen -W '${COMPREPLY[@]}' -- "$curr") )
+          ;;
+        vs|sp|tab)
+          _filedir_xspec
+          COMPREPLY=( $(compgen -W '${COMPREPLY[@]}' -- "$curr") )
+          ;;
+        make)
+          _make
+          COMPREPLY=( $(compgen -W '${COMPREPLY[@]}' -- "$curr") )
+          ;;
+        *)
+          ;;
+      esac
+    fi
   fi
   return 0
 }
 
-complete -F _tovim_complete tovim
+
+complete -o default -F _tovim_complete tovim
