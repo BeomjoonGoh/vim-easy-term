@@ -144,13 +144,13 @@ For Example, >
 <Plug>(EasyTermSendText)	mode: normal(n), visual(x)
 
 	Sends current line(n) or visually selected texts(x) to the primary
-	terminal buffer.  It is useful to test sections of a shell, python or
-	vim script as you write so that the terminal buffer acts as a (crude)
-	REPL environment.
+	terminal buffer.  It is useful for testing sections of a shell, python
+	or vim script as you write so that the terminal buffer acts as a
+	(crude) REPL environment.
 
 	If current buffer's 'filetype' is python or vim, the text is treated
-	so that python or ex gives in the expected behavior.  For example, in
-	a python script, >
+	so that the program gives results in the expected manner.  For
+	example, in a python script, >
 		if 'a' == 'b':
 		    print("a is b")
 		print(1 + 2)
@@ -165,9 +165,11 @@ For Example, >
 		SyntaxError: invalid syntax
 		>>> 
 <	since python expects a new line character after an indented block such
-	as class, def, for, and if-else.  Likewise, `ex` gives an error when
-	empty line is entered or line-continuation exists.
-	|<Plug>(EasyTermSendText)| takes care of (most of) these cases.
+	as class, def, for, and if-else.  Also, if only the second line was
+	sent, i.e. with an unexpected indent, the indentation is removed.
+	Likewise, `ex` gives an error when empty line is entered or
+	line-continuation exists.  |<Plug>(EasyTermSendText)| takes care of
+	(most of) these cases.
 
 	 					      *<Plug>(EasyTermPutLast)*
 <Plug>(EasyTermPutLast)		mode: normal(n)
