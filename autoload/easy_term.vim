@@ -169,9 +169,11 @@ function! s:ProcessVimscript(code) abort
 endfunction
 
 function! s:ProcessPython(code) abort
+  let l:first_indent = match(a:code,'\m\w')
   let l:text = ""
   let l:previous_indent = 0
   for l:line in split(a:code, '\m\n\+')
+    let l:line=l:line[l:first_indent:]
     let l:current_indent = match(l:line, '\m\w')
     if !l:current_indent && l:previous_indent && split(l:line)[0] !~ 'el\(se\|if\)'
       let l:text .= "\n"
