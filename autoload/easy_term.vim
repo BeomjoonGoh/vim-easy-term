@@ -117,9 +117,7 @@ function! easy_term#SetBufnr(bufnr) abort
 endfunction
 
 function! easy_term#Complete(A,L,P) abort
-  let l:k = keys(g:easy_term_alias)
-  call remove(l:k, get(l:k, ""))
-  return join(sort(l:k),"\n")
+  return join(sort(keys(g:easy_term_alias)),"\n")
 endfunction
 
 " terminal-api
